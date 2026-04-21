@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Keren</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Animasi Background Gradient Bergerak */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #000000);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Container */
+        .calculator {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+        }
+
+        .calculator:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Layar Kalkulator Vibe Cyberpunk */
+        .display {
+            width: 100%;
+            height: 90px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            color: #00ffcc; /* Warna Neon Cyan */
+            font-size: 2.8em;
+            text-align: right;
+            padding: 20px;
+            font-family: 'Orbitron', sans-serif; /* Font ala Digital/Robot */
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.8);
+            outline: none;
+            letter-spacing: 2px;
+        }
+
+        /* Grid Layout untuk Tombol */
+        .keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* Styling Dasar Tombol */
+        button {
+            width: 65px;
+            height: 65px;
+            border: none;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efek mantul */
+        }
+
+        /* Efek saat mouse mengambang (Hover) */
+        button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+        }
+
+        /* Efek saat ditekan (Active) */
+        button:active {
+            transform: scale(0.9);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Warna Khusus Tombol Operator & Fungsi */
+        .operator { color: #ff3366; font-weight: 600; } /* Neon Pink */
+        .highlight { color: #00ffcc; background: rgba(0, 255, 204, 0.05); } 
+        
+        /* Tombol Sama Dengan (=) Glowing */
+        .equal {
+            background: #00ffcc;
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+        }
+
+        .equal:hover {
+            background: #00e6b8;
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.8);
+        }
+        
+        /* Tombol 0 lebih lebar */
+        .zero {
+            grid-column: span 2;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <input type="text" class="display" id="display" disabled value="">
+        
+        <div class="keys">
+            <button class="operator" onclick="clearDisplay()">AC</button>
+            <button class="operator" onclick="deleteChar()">DEL</button>
+            <button class="operator highlight" onclick="appendOperator('%')">%</button>
+            <button class="operator highlight" onclick="appendOperator('/')">÷</button>
+
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operator highlight" onclick="appendOperator('*')">×</button>
+
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operator highlight" onclick="appendOperator('-')">-</button>
+
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="operator highlight" onclick="appendOperator('+')">+</button>
+
+            <button class="zero" onclick="appendNumber('0')">0</button>
+            <button onclick="appendNumber('.')">.</button>
+            <button class="equal" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        let currentExpression = '';
+
+        // Nambahin angka ke layar
+        function appendNumber(num) {
+            if(display.value === 'Error') {
+                display.value = '';
+                currentExpression = '';
+            }
+            display.value += num;
+            currentExpression += num;
+        }
+
+        // Nambahin operator matematika (+, -, *, /)
+        function appendOperator(op) {
+            if(display.value === 'Error' || display.value === '') return;
+            
+            const lastChar = currentExpression.slice(-1);
+            // Kalo ujungnya udah operator, ganti sama operator baru
+            if(['+', '-', '*', '/', '%'].includes(lastChar)) {
+                currentExpression = currentExpression.slice(0, -1) + op;
+                display.value = display.value.slice(0, -1) + (op === '*' ? '×' : op === '/' ? '÷' : op);
+            } else {
+                currentExpression += op;
+                display.value += (op === '*' ? '×' : op === '/' ? '÷' : op);
+            }
+        }
+
+        // Hapus semua (AC)
+        function clearDisplay() {
+            display.value = '';
+            currentExpression = '';
+        }
+
+        // Hapus 1 karakter (DEL)
+        function deleteChar() {
+            if(display.value === 'Error') {
+                clearDisplay();
+                return;
+            }
+            display.value = display.value.slice(0, -1);
+            currentExpression = currentExpression.slice(0, -1);
+        }
+
+        // Menghitung hasil
+        function calculate() {
+            if(currentExpression === '') return;
+            try {
+                // Menghitung ekspresi dengan math eval bawaan JS
+                let result = eval(currentExpression);
+                
+                // Cek kalau hasilnya desimal, potong kepanjangan
+                if (!Number.isInteger(result)) {
+                    result = parseFloat(result.toFixed(6));
+                }
+                
+                display.value = result;
+                currentExpression = result.toString();
+            } catch (error) {
+                display.value = 'Error';
+                currentExpression = '';
+            }
+        }
+    </script>
+</body>
+</html>
